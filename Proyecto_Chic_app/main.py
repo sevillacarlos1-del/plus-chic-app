@@ -76,7 +76,7 @@ def inject_css():
             padding-left:   32px   !important;
             padding-right:  32px   !important;
             max-width:      1200px !important;
-            margin: 0 auto        !important;
+            margin: 0 auto         !important;
         }
     }
 
@@ -154,7 +154,12 @@ def inject_css():
         box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
     }
 
-    .btn-outline {
+    /* Ajuste para los botones nativos de Streamlit (st.link_button) */
+    .stLinkButton {
+        display: block !important;
+        width: 100% !important;
+    }
+    .stLinkButton a {
         background: transparent !important;
         color: #1A1A1A !important;
         border: 2px solid #D4AF37 !important;
@@ -165,15 +170,18 @@ def inject_css():
         letter-spacing: 0.1em !important;
         text-transform: uppercase !important;
         border-radius: 30px !important;
-        cursor: pointer !important;
-        width: 100%;
+        width: 100% !important;
         transition: all 0.3s ease !important;
-        display: block;
-        text-align: center;
+        display: flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        text-decoration: none !important;
     }
-    .btn-outline:hover {
+    .stLinkButton a:hover {
         background: linear-gradient(135deg, #D4AF37 0%, #AA820A 100%) !important;
         color: #FFFFFF !important;
+        border-color: #AA820A !important;
+        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
     }
 
     /* ── PRECIOS: Negro Puro y Elegante abajo ── */
@@ -276,9 +284,9 @@ CATALOG = [
         "file":    "regalo1.jpg",
         "name":    "Gift Set Elite",
         "caption": "Premium hand-curated gift box. Perfect for celebrating unique moments.",
-        "price":   "", 
+        "price":    "", 
         "msg":     "Hi! I'm interested in the Gift Set Elite. Is it available?",
-    },                                                                              
+    },                                                                               
     {
         "file":    "regalo2_nuevo.jpg",
         "name":    "Golden Arrangement",
@@ -358,7 +366,7 @@ def wa_button(msg: str, label: str = "✦ Order via WhatsApp") -> str:
 # ── Render Tarjeta de Producto (100% HTML) ──────────────────────────
 def render_product_card(product: dict) -> str:
     src      = img_b64(product["file"])
-    wa_html  = wa_button(product["msg"])
+    wa_html   = wa_button(product["msg"])
     
     price_val = product.get('price', '').strip()
     price_html = f'<div class="product-price-bottom">{price_val}</div>' if price_val else ''
@@ -386,8 +394,9 @@ def render_product_card(product: dict) -> str:
 
 # ── Render Catálogo ───────────────────────────────────────────────────────────
 def render_catalog():
+    # Agregamos un id HTML para el anclaje del botón
     st.markdown("""
-    <div style="text-align:center;padding:40px 0 24px;">
+    <div id="catalog" style="text-align:center;padding:40px 0 24px;">
       <p class="ornament">✦ EXCLUSIVE COLLECTION ✦</p>
       <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.4rem);
                  color:#1A1A1A;margin:12px 0 8px;">Our Catalog</h2>
@@ -426,10 +435,8 @@ def render_inicio():
                 "✦ Contact Us"
             ), unsafe_allow_html=True)
         with col_b:
-            st.markdown("""
-            <a href="#catalog" style="text-decoration:none;">
-              <button class="btn-outline">View Catalog →</button>
-            </a>""", unsafe_allow_html=True)
+            # CIRUGÍA AQUÍ: Reemplazo por el componente nativo st.link_button enlazado al id #catalog
+            st.link_button("View Catalog →", "#catalog")
 
     st.markdown('<div class="divider-gold"></div>', unsafe_allow_html=True)
 
