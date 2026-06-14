@@ -28,7 +28,7 @@ WHATSAPP_BASE   = f"https://wa.me/{WHATSAPP_NUMBER}"
 
 # ── Helper: imagen → base64 (evita el widget st.image y sus márgenes) ─────────
 def img_b64(filename: str) -> str:
-    """Devuelve un data-URI base64 listo para usar en <img src=...>. """
+    """Devuelve un data-URI base64 listo para usar in <img src=...>. """
     p = ASSETS / filename
     if not p.exists():
         return ""
@@ -105,7 +105,7 @@ def inject_css():
         vertical-align: bottom !important;
     }
 
-    /* ── CUADRO DE DISEÑO CON ESPACIADO INFERIOR SEGURO (Nativo de Streamlit) ── */
+    /* ── CUADRO DE DISEÑO CON ESPACIADO INFERIOR SEGURO ── */
     .product-card, .glass-card, .contact-img {
         background: #FFFFFF !important;
         border: 2px solid #D4AF37 !important;
@@ -117,7 +117,7 @@ def inject_css():
         display: flex !important;
         flex-direction: column !important;
         height: 100% !important; 
-        margin-bottom: 24px !important; /* <--- Esto evita que se monten las de abajo */
+        margin-bottom: 24px !important;
     }
     
     .product-card:hover, .glass-card:hover, .contact-img:hover {
@@ -154,37 +154,7 @@ def inject_css():
         box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
     }
 
-    /* Ajuste para los botones nativos de Streamlit (st.link_button) */
-    .stLinkButton {
-        display: block !important;
-        width: 100% !important;
-    }
-    .stLinkButton a {
-        background: transparent !important;
-        color: #1A1A1A !important;
-        border: 2px solid #D4AF37 !important;
-        padding: 14px 24px !important;
-        font-family: 'Montserrat', sans-serif !important;
-        font-size: 0.8rem !important;
-        font-weight: 600 !important;
-        letter-spacing: 0.1em !important;
-        text-transform: uppercase !important;
-        border-radius: 30px !important;
-        width: 100% !important;
-        transition: all 0.3s ease !important;
-        display: flex !important;
-        align-items: center !important;
-        justify-content: center !important;
-        text-decoration: none !important;
-    }
-    .stLinkButton a:hover {
-        background: linear-gradient(135deg, #D4AF37 0%, #AA820A 100%) !important;
-        color: #FFFFFF !important;
-        border-color: #AA820A !important;
-        box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
-    }
-
-    /* ── PRECIOS: Negro Puro y Elegante abajo ── */
+    /* ── PRECIOS: Negro Puro y Elegante ── */
     .product-price-bottom {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 0.85rem !important;
@@ -231,12 +201,13 @@ def inject_css():
         box-shadow: 0 1px 4px rgba(170, 130, 10, 0.25);
     }
 
-    /* ── Tabs navegación ── */
+    /* ── Tabs navegación reubicadas con margen superior seguro ── */
     .stTabs [data-baseweb="tab-list"] {
         background: rgba(255,255,255,0.95);
         backdrop-filter: blur(14px);
         border-bottom: 2px solid #D4AF37;
         padding: 0 12px;
+        margin-top: 20px !important; /* <--- Esto baja la navegación un poco más abajo del título principal */
         position: sticky; top: 0; z-index: 999;
         overflow-x: auto;
         gap: 0;
@@ -394,9 +365,8 @@ def render_product_card(product: dict) -> str:
 
 # ── Render Catálogo ───────────────────────────────────────────────────────────
 def render_catalog():
-    # Agregamos un id HTML para el anclaje del botón
     st.markdown("""
-    <div id="catalog" style="text-align:center;padding:40px 0 24px;">
+    <div style="text-align:center;padding:40px 0 24px;">
       <p class="ornament">✦ EXCLUSIVE COLLECTION ✦</p>
       <h2 style="font-family:'Playfair Display',serif;font-size:clamp(1.6rem,5vw,2.4rem);
                  color:#1A1A1A;margin:12px 0 8px;">Our Catalog</h2>
@@ -408,7 +378,6 @@ def render_catalog():
     <div class="divider-gold"></div>
     """, unsafe_allow_html=True)
 
-    # Volvemos a las columnas nativas de Streamlit de 3 en 3, pero blindadas con margin-bottom CSS
     cols = st.columns(3)
     for i, p in enumerate(CATALOG):
         with cols[i % 3]:
@@ -417,26 +386,22 @@ def render_catalog():
 # ── Tab: INICIO ───────────────────────────────────────────────────────────────
 def render_inicio():
     st.markdown("""
-    <section style="text-align:center;padding:48px 16px 36px;">
+    <section style="text-align:center;padding:48px 16px 20px;">
       <p class="ornament">✦ LUXURY BOUTIQUE ✦</p>
       <h1 class="hero-title animate__animated animate__fadeInDown" style="margin:16px 0 20px;">+CHIC</h1>
-      <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s" style="margin:0 auto 36px;">
+      <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s" style="margin:0 auto 24px;">
         Luxury gifts for unforgettable moments.
       </p>
     </section>
     """, unsafe_allow_html=True)
 
-    c1, c2, c3 = st.columns([1, 2, 1])
+    # Sección de botones simplificada: Solamente el botón de Contacto premium centrado
+    c1, c2, c3 = st.columns([1.2, 1.6, 1.2])
     with c2:
-        col_a, col_b = st.columns(2)
-        with col_a:
-            st.markdown(wa_button(
-                "Hi! I'd love to learn more about +CHIC gifts.",
-                "✦ Contact Us"
-            ), unsafe_allow_html=True)
-        with col_b:
-            # CIRUGÍA AQUÍ: Reemplazo por el componente nativo st.link_button enlazado al id #catalog
-            st.link_button("View Catalog →", "#catalog")
+        st.markdown(wa_button(
+            "Hi! I'd love to learn more about +CHIC gifts.",
+            "✦ Contact Us"
+        ), unsafe_allow_html=True)
 
     st.markdown('<div class="divider-gold"></div>', unsafe_allow_html=True)
 
@@ -452,7 +417,6 @@ def render_inicio():
     </div>
     """, unsafe_allow_html=True)
 
-    # Dejamos el título y descripción vacíos para los globos (inicio1.jpg)
     essence = [
         ("inicio1.jpg", "", ""), 
         ("inicio2.jpg", "Impeccable Presentation", "Luxury boxes, silk ribbons, and a flawless finish."),
@@ -469,7 +433,6 @@ def render_inicio():
             if src else ""
         )
         
-        # SI TIENE TEXTO: Renderiza la tarjeta completa con su info abajo
         if title:
             cards += f"""
             <div class="glass-card">
@@ -479,8 +442,6 @@ def render_inicio():
                 <p class="product-caption">{desc}</p>
               </div>
             </div>"""
-        # SI NO TIENE TEXTO (Como los globos): Forzamos marco dorado ceñido, transparente y sin estiramiento vertical
-        # Aquí eliminamos la estructura/contenedor blanco de abajo
         else:
             cards += f"""
             <div class="glass-card" style="background:transparent !important; display:block !important; height:auto !important;">
