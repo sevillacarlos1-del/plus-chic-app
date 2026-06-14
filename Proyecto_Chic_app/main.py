@@ -8,6 +8,7 @@ Arquitectura: Proyecto_Chic_app/
 
 import streamlit as st
 import base64
+import urllib.parse  # Librería arriba y protegida para evitar caídas del servidor
 from pathlib import Path
 
 # ── Configuración de página ───────────────────────────────────────────────────
@@ -26,7 +27,7 @@ CSS_FILE = BASE_DIR / "css" / "luxury_style.css"
 WHATSAPP_NUMBER = "19412989750"
 WHATSAPP_BASE   = f"https://wa.me/{WHATSAPP_NUMBER}"
 
-# ── Helper: imagen → base64 (evita el widget st.image y sus márgenes) ─────────
+# ── Helper: imagen → base64 ───────────────────────────────────────────────────
 def img_b64(filename: str) -> str:
     """Devuelve un data-URI base64 listo para usar in <img src=...>. """
     p = ASSETS / filename
@@ -55,22 +56,22 @@ def inject_css():
         --chic-red: #8B0000; 
     }
 
-    /* Activar el desplazamiento suave global */
+    /* Activación del deslizamiento fluido */
     html, body, .stApp {
         scroll-behavior: smooth !important;
     }
 
-    /* ── Fondo global con más aire inferior para permitir el movimiento ── */
+    /* Margen extra al fondo para asegurar que las páginas tengan espacio para moverse */
     .stApp {
         background-color: #FAFAF8 !important;
         background-image:
             radial-gradient(at 0% 0%,    rgba(212,175,55,0.08) 0, transparent 55%),
             radial-gradient(at 100% 100%,rgba(139,0,0,0.05)   0, transparent 55%);
         background-attachment: fixed;
-        padding-bottom: 60px !important;
+        padding-bottom: 80px !important;
     }
 
-    /* ── Ocultar chrome de Streamlit ── */
+    /* ── Ocultar marcas de Streamlit ── */
     #MainMenu, header, footer { visibility: hidden !important; }
     [data-testid="stDecoration"]  { display: none !important; }
     [data-testid="stStatusWidget"]{ display: none !important; }
@@ -92,23 +93,19 @@ def inject_css():
         }
     }
 
-    /* ── MARGENES Y GAP BLINDADOS PARA COLUMNAS NATIVAS ── */
+    /* Márgenes blindados */
     [data-testid="stVerticalBlock"]   { gap: 0 !important; padding: 0 !important; }
     [data-testid="column"]            { padding: 10px !important; background-color: transparent !important; }
     [data-testid="stHorizontalBlock"] { gap: 16px !important; background-color: transparent !important; }
     div[data-styled-column="true"]    { background-color: transparent !important; }
 
-    /* Eliminar márgenes del wrapper de imagen nativo */
-    [data-testid="stImage"],
-    [data-testid="stImage"] > *,
-    .stImage, .stImage > * {
+    [data-testid="stImage"], [data-testid="stImage"] > *, .stImage, .stImage > * {
         margin:  0 !important;
         padding: 0 !important;
         line-height: 0 !important;
         font-size:   0 !important;
     }
 
-    /* Imágenes HTML puras */
     .product-img-wrap img, .contact-img img {
         display: block !important;
         margin:  0 !important;
@@ -117,7 +114,7 @@ def inject_css():
         vertical-align: bottom !important;
     }
 
-    /* ── CUADRO DE DISEÑO ── */
+    /* ── Tarjetas de Producto ── */
     .product-card, .glass-card, .contact-img {
         background: #FFFFFF !important;
         border: 2px solid #D4AF37 !important;
@@ -138,7 +135,7 @@ def inject_css():
         transform: translateY(-4px);
     }
 
-    /* ── Estilos de botones premium de oro líquido ── */
+    /* Botones de acción oro líquido */
     .btn-gold {
         background: linear-gradient(135deg, #FFE57F 0%, #D4AF37 50%, #AA820A 100%) !important;
         text-shadow: 0 1px 2px rgba(0,0,0,0.2);
@@ -166,7 +163,6 @@ def inject_css():
         box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
     }
 
-    /* ── PRECIOS ── */
     .product-price-bottom {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 0.85rem !important;
@@ -178,7 +174,6 @@ def inject_css():
         letter-spacing: 0.05em !important;
     }
 
-    /* ── SECCIÓN CENTRALIZADA ── */
     .product-info { 
         padding: 12px 14px 14px 14px !important;
         text-align: center !important; 
@@ -204,7 +199,6 @@ def inject_css():
     }
     .ornament { font-family: 'Montserrat', sans-serif; font-size: 0.68rem; letter-spacing: 0.25em; color: #D4AF37; text-transform: uppercase; }
 
-    /* Divisores Dorados Finos */
     .divider-gold {
         height: 4px;
         background: #D4AF37;
@@ -213,27 +207,27 @@ def inject_css():
         box-shadow: 0 1px 4px rgba(170, 130, 10, 0.25);
     }
 
-    /* ── TABS NAVEGACIÓN REUBICADAS Y DORADAS METALIZADAS ── */
+    /* ── TABS NAVEGACIÓN PERFECCIONADAS EN DORADO METALIZADO ── */
     .stTabs [data-baseweb="tab-list"] {
         background: rgba(255,255,255,0.96);
         backdrop-filter: blur(14px);
         border-bottom: 2px solid #D4AF37;
         padding: 0 12px;
-        margin-top: 24px !important;
+        margin-top: 24px !important; /* Espaciado elegante bajo el título */
         position: sticky; top: 0; z-index: 999;
         overflow-x: auto;
         gap: 0;
         box-shadow: 0 4px 12px rgba(170, 130, 10, 0.05);
     }
     
-    /* Estado Normal: Letras doradas elegantes */
+    /* Letras Doradas en estado normal */
     .stTabs [data-baseweb="tab"] {
         font-family: 'Montserrat', sans-serif !important;
         font-size:   0.74rem  !important;
         font-weight: 600      !important;
         letter-spacing: 0.14em !important;
         text-transform: uppercase !important;
-        color: #C5A028 !important; /* Dorado base sofisticado */
+        color: #C5A028 !important; /* Dorado base fino */
         padding: 18px 20px !important;
         border:  none !important;
         background: transparent !important;
@@ -242,7 +236,7 @@ def inject_css():
         opacity: 0.85;
     }
     
-    /* Estado Activo (Seleccionado): Oro Líquido Brillante Metalizado */
+    /* Oro Líquido reflectivo cuando está seleccionado */
     .stTabs [aria-selected="true"] {
         color: #AA820A !important;
         background: linear-gradient(135deg, #AA820A 0%, #D4AF37 50%, #AA820A 100%) !important;
@@ -254,14 +248,12 @@ def inject_css():
         transform: scale(1.02);
     }
     
-    /* Al pasar el mouse por encima */
     .stTabs [data-baseweb="tab"]:hover {
         color: #D4AF37 !important;
         opacity: 1;
     }
     
-    .stTabs [data-baseweb="tab-highlight"],
-    .stTabs [data-baseweb="tab-border"] { display: none !important; }
+    .stTabs [data-baseweb="tab-highlight"], .stTabs [data-baseweb="tab-border"] { display: none !important; }
 
     .essence-grid {
         display: grid !important;
@@ -271,15 +263,13 @@ def inject_css():
     }
     @media (min-width: 640px)  { .essence-grid { grid-template-columns: repeat(3, 1fr) !important; } }
     
-    .contact-img-wrap {
-        margin-bottom: 20px !important;
-    }
+    .contact-img-wrap { margin-bottom: 20px !important; }
     </style>
     """, unsafe_allow_html=True)
 
 inject_css()
 
-# ── Catálogo: diccionarios con metadatos completos ────────────────────────────
+# ── Catálogo ──────────────────────────────────────────────────────────────────
 CATALOG = [
     {
         "file":    "regalo1.jpg",
@@ -346,13 +336,8 @@ CATALOG = [
     },
 ]
 
-# ── Helper: ibujado local ──────────────────────────────────────────────────────
-def asset_path(filename: str) -> Path:
-    return ASSETS / filename
-
 # ── Helper: botón WhatsApp HTML ───────────────────────────────────────────────
 def wa_button(msg: str, label: str = "✦ Order via WhatsApp") -> str:
-    import urllib.parse
     url = f"{WHATSAPP_BASE}?text={urllib.parse.quote(msg)}"
     return f"""
     <a href="{url}" target="_blank" style="text-decoration:none; display:block; width:100%;">
@@ -364,7 +349,7 @@ def wa_button(msg: str, label: str = "✦ Order via WhatsApp") -> str:
       </button>
     </a>"""
 
-# ── Render Tarjeta de Producto (100% HTML) ──────────────────────────
+# ── Render Tarjeta de Producto ────────────────────────────────────────────────
 def render_product_card(product: dict) -> str:
     src      = img_b64(product["file"])
     wa_html   = wa_button(product["msg"])
@@ -425,6 +410,7 @@ def render_inicio():
     </section>
     """, unsafe_allow_html=True)
 
+    # Botón único de contacto premium centrado, sin el botón problemático de abajo
     c1, c2, c3 = st.columns([1.2, 1.6, 1.2])
     with c2:
         st.markdown(wa_button(
