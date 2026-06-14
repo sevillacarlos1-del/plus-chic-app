@@ -46,16 +46,28 @@ def inject_css():
 
     st.markdown("""
     <style>
-    /* ── Paleta ── */
-    :root { --chic-white:#FFFFFF; --chic-gold:#D4AF37; --chic-red:#8B0000; }
+    /* ── Paleta y Comportamiento Global ── */
+    :root { 
+        --chic-white: #FFFFFF; 
+        --chic-gold: #D4AF37; 
+        --chic-gold-light: #FFE57F;
+        --chic-gold-dark: #AA820A;
+        --chic-red: #8B0000; 
+    }
 
-    /* ── Fondo global ── */
+    /* Activar el desplazamiento suave global */
+    html, body, .stApp {
+        scroll-behavior: smooth !important;
+    }
+
+    /* ── Fondo global con más aire inferior para permitir el movimiento ── */
     .stApp {
         background-color: #FAFAF8 !important;
         background-image:
             radial-gradient(at 0% 0%,    rgba(212,175,55,0.08) 0, transparent 55%),
             radial-gradient(at 100% 100%,rgba(139,0,0,0.05)   0, transparent 55%);
         background-attachment: fixed;
+        padding-bottom: 60px !important;
     }
 
     /* ── Ocultar chrome de Streamlit ── */
@@ -66,7 +78,7 @@ def inject_css():
     /* ── MOBILE-FIRST: contenedor principal ── */
     .block-container {
         padding-top:    0    !important;
-        padding-bottom: 0    !important;
+        padding-bottom: 40px !important;
         padding-left:   12px !important;
         padding-right:  12px !important;
         max-width:      100% !important;
@@ -96,7 +108,7 @@ def inject_css():
         font-size:   0 !important;
     }
 
-    /* Imágenes HTML puras dentro de product-card o glass-card */
+    /* Imágenes HTML puras */
     .product-img-wrap img, .contact-img img {
         display: block !important;
         margin:  0 !important;
@@ -105,7 +117,7 @@ def inject_css():
         vertical-align: bottom !important;
     }
 
-    /* ── CUADRO DE DISEÑO CON ESPACIADO INFERIOR SEGURO ── */
+    /* ── CUADRO DE DISEÑO ── */
     .product-card, .glass-card, .contact-img {
         background: #FFFFFF !important;
         border: 2px solid #D4AF37 !important;
@@ -154,7 +166,7 @@ def inject_css():
         box-shadow: 0 6px 16px rgba(212, 175, 55, 0.4) !important;
     }
 
-    /* ── PRECIOS: Negro Puro y Elegante ── */
+    /* ── PRECIOS ── */
     .product-price-bottom {
         font-family: 'Montserrat', sans-serif !important;
         font-size: 0.85rem !important;
@@ -201,35 +213,53 @@ def inject_css():
         box-shadow: 0 1px 4px rgba(170, 130, 10, 0.25);
     }
 
-    /* ── Tabs navegación reubicadas con margen superior seguro ── */
+    /* ── TABS NAVEGACIÓN REUBICADAS Y DORADAS METALIZADAS ── */
     .stTabs [data-baseweb="tab-list"] {
-        background: rgba(255,255,255,0.95);
+        background: rgba(255,255,255,0.96);
         backdrop-filter: blur(14px);
         border-bottom: 2px solid #D4AF37;
         padding: 0 12px;
-        margin-top: 20px !important; /* <--- Esto baja la navegación un poco más abajo del título principal */
+        margin-top: 24px !important;
         position: sticky; top: 0; z-index: 999;
         overflow-x: auto;
         gap: 0;
+        box-shadow: 0 4px 12px rgba(170, 130, 10, 0.05);
     }
+    
+    /* Estado Normal: Letras doradas elegantes */
     .stTabs [data-baseweb="tab"] {
         font-family: 'Montserrat', sans-serif !important;
-        font-size:   0.72rem  !important;
+        font-size:   0.74rem  !important;
         font-weight: 600      !important;
         letter-spacing: 0.14em !important;
         text-transform: uppercase !important;
-        color:   #6B6B6B !important;
-        padding: 18px 16px !important;
+        color: #C5A028 !important; /* Dorado base sofisticado */
+        padding: 18px 20px !important;
         border:  none !important;
         background: transparent !important;
         white-space: nowrap !important;
-        transition: color 0.3s !important;
+        transition: all 0.3s ease-in-out !important;
+        opacity: 0.85;
     }
+    
+    /* Estado Activo (Seleccionado): Oro Líquido Brillante Metalizado */
     .stTabs [aria-selected="true"] {
-        color: #8B0000 !important;
+        color: #AA820A !important;
+        background: linear-gradient(135deg, #AA820A 0%, #D4AF37 50%, #AA820A 100%) !important;
+        -webkit-background-clip: text !important;
+        -webkit-text-fill-color: transparent !important;
+        text-shadow: 0px 1px 1px rgba(212, 175, 55, 0.2) !important;
         border-bottom: 3px solid #D4AF37 !important;
-        background: transparent !important;
+        opacity: 1 !important;
+        transform: scale(1.02);
     }
+    
+    /* Al pasar el mouse por encima */
+    .stTabs [data-baseweb="tab"]:hover {
+        color: #D4AF37 !important;
+        opacity: 1;
+    }
+    
     .stTabs [data-baseweb="tab-highlight"],
     .stTabs [data-baseweb="tab-border"] { display: none !important; }
 
@@ -395,7 +425,6 @@ def render_inicio():
     </section>
     """, unsafe_allow_html=True)
 
-    # Sección de botones simplificada: Solamente el botón de Contacto premium centrado
     c1, c2, c3 = st.columns([1.2, 1.6, 1.2])
     with c2:
         st.markdown(wa_button(
